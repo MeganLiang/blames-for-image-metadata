@@ -4,7 +4,8 @@
 #
 # Author:      liangm
 #
-# Created:     07/07/2014
+#Alternation versiom:   contains drop box for licence
+# Created:     11/07/2014
 # Copyright:   (c) liangm 2014
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
@@ -89,31 +90,14 @@ class GUI:
         licence_label.pack()
         self.licence_field = Entry(window)
         self.licence_field.pack()
-        #RAISED sets 3D shading effects
-        licence=  Menubutton ( window, text=" Select licence type", relief=RAISED )
-        licence.grid()
-        #Menu is a method built in TKinter http://www.tutorialspoint.com/python/tk_menubutton.htm
-        licence.menu  =  Menu ( licence, tearoff = 0 )
-        licence["menu"]  =  licence.menu
-        BY_Var  = IntVar()
-        BYND_Var = IntVar()
-        BYSA_Var = IntVar()
-        BYNC_Var = IntVar()
-        BYNCND_Var = IntVar()
-        BYNCSA_Var = IntVar()
-        licence.menu.add_checkbutton ( label="Attribution alone",
-                                  variable = BY_Var )
-        licence.menu.add_checkbutton ( label="Attribution + NoDerivatives",
-                                  variable = BYND_Var )
-        licence.menu.add_checkbutton ( label="Attribution + ShareAlike",
-                                  variable = BYSA_Var )
-        licence.menu.add_checkbutton ( label="Attribution + Noncommercial",
-                                  variable = BYNC_Var )
-        licence.menu.add_checkbutton ( label="Attribution + Noncommercial + NoDerivatives",
-                                  variable = BYNCND_Var )
-        licence.menu.add_checkbutton ( label="Attribution + Noncommercial + ShareAlike",
-                                  variable = BYNCSA_Var )
-        licence.pack()
+
+        #Prints the chosen attribute
+        def print_it(event):
+            print (licence.get())
+        licence = StringVar()
+        licence.set("Attribution alone")
+        #OptionMenu() only allows one variable to be chosen as opposed to MenuButton() (seen in V1)
+        OptionMenu(window, licence, "Attribution alone","Attribution + NoDerivatives","Attribution + ShareAlike", "Attribution + Noncommercial", "Attribution + Noncommercial + NoDerivatives", "Attribution + Noncommercial + ShareAlike", command=print_it).pack()
 
         #creates a button. The command function is run when the button is pressed
         #the 'command=self.doSubmit' is an example of a callback method
@@ -134,7 +118,7 @@ class GUI:
 
     def doSubmit(self):
         #this is the callback method for the 'Submit' button
-        if len(self.image_id_field.get()) <1 or len(self.file_ext_field.get()) <1 or len(self.title_field.get()) <1 or len(self.owner_field.get()) <1 or len(self.licence_field.get()) <1:
+        if len(self.image_id_field.get()) <1 or len(self.file_ext_field.get()) <1 or len(self.title_field.get()) <1 or len(self.owner_field.get()) <1:
             tkinter.messagebox.showwarning('Warning!','Please enter a value for all fields')
         else:
             try:
