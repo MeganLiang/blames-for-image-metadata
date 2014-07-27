@@ -3,7 +3,8 @@
 #
 # Purpose:
 # Author:      Megan
-# Sources:      http://www.daniweb.com/software-development/python/threads/391736/how-to-add-a-drop-down-menu-and-return-the-selected-option
+# Sources:      http://stackoverflow.com/questions/21043387/how-do-you-add-input-from-user-into-list-in-python
+#                http://stackoverflow.com/questions/5278122/checking-if-all-elements-in-a-list-are-unique
 #
 # Created:     16/07/2014
 # Copyright:   (c) Megan 2014
@@ -51,9 +52,6 @@ class Image:
     def get_licence(self):
         return self.licence
 
-
-
-
 #create the GUI interface
 class GUI:
     #init should return None, only self
@@ -68,6 +66,7 @@ class GUI:
         #this variable stores whether the data has been validated or not
         self.ready_to_write = False
         self.recordlist = []
+
         self.licence_init = ""
 
         #creating label and field variables in GUI
@@ -115,13 +114,24 @@ class GUI:
         window.mainloop()
 
     def doSubmit(self):
+       #test uniqueness of each school name entered u
+       noduplicate = True;
+       for record in self.recordlist:
+           if self.image_id_field.get() == record.get_id():
+               noduplicate= False
+               tkinter.messagebox.showwarning('Warning!','Duplicate image ID');
+               print('Please enter image ID again');
 
-        if len(self.image_id_field.get()) <1 or len(self.file_ext_field.get()) <1 or len(self.title_field.get()) <1 or len(self.owner_field.get()) <1 or self.licence.get() == "Select licence type":
+
+       if noduplicate == True:
+        if len(self.image_id_field.get()) <1 or len(self.file_ext_field.get()) <1 or len(self.title_field.get()) <1 or len(self.owner_field.get()) <1 or self.licence.get() == (self.licence_init):
             tkinter.messagebox.showwarning('Warning!','Please enter a value for all fields')
         else:
             try:
                 validated_integer = int(self.image_id_field.get())
                 self.recordlist.append(Image(self.image_id_field.get(), self.file_ext_field.get(), self.title_field.get(), self.owner_field.get(), self.licence.get()))
+
+
                 self.ready_to_write= True
                 tkinter.messagebox.showinfo('Notice','Submission Successful')
 
@@ -135,25 +145,27 @@ class GUI:
                 tkinter.messagebox.showwarning('Warning!','Please enter numeric data for image ID')
                 print('Please enter numeric data for image ID')
 
+
+
     def writetocsv(self):
-        #this is the callback method for the 'write to csv' button
-        import csv
-        file_name = 'database.txt'
-        imageID_list = []
+            #this is the callback method for the 'write to csv' button
+            import csv
+            file_name = 'database.txt'
 
-        if self.ready_to_write: #cheacks data has been previously validated
-            ofile = open(file_name, 'a') #open with write('w') or append('a') privelages
-            writer = csv.writer(ofile, delimiter=',')
-            #cycles through list of records created by gui
-            for record in self.recordlist:
-                writer.writerow([record.get_id(),record.get_file_and_ext(), record.get_title(), record.get_owner(), record.get_licence()])
-            #explicitly closes the output file
-            ofile.close()
-        else:
-            tkinter.messagebox.showwarning('Error!', 'You need to Validate your data')
+            if self.ready_to_write: #cheacks data has been previously validated
+                ofile = open(file_name, 'a') #open with write('w') or append('a') privelages
+                writer = csv.writer(ofile, delimiter=',')
+                #cycles through list of records created by gui
 
-        self.ready_to_write= False
-        tkinter.messagebox.showinfo('Notice',file_name+' File Generated Successfully')
+                for record in self.recordlist:
+                    writer.writerow([record.get_id(),record.get_file_and_ext(), record.get_title(), record.get_owner(), record.get_licence()])
+                #explicitly closes the output file
+                ofile.close()
+            else:
+                tkinter.messagebox.showwarning('Error!', 'You need to Validate your data')
+
+            self.ready_to_write= False
+            tkinter.messagebox.showinfo('Notice',file_name+' File Generated Successfully')
 
 #initialises the programme
 GUI()
