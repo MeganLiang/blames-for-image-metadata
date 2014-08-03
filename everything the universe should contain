@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        metadata_imgV6
+# Name:        metadata_imgV7
 #
 # Purpose:      To collect metadata about images including their ID, file name and extension, title, owner, and licence type, then write data to a CSV file so that it may be imported to a database
 # Author:      Megan
@@ -7,7 +7,7 @@
 #               http://stackoverflow.com/questions/5278122/checking-if-all-elements-in-a-list-are-unique
 #               http://stackoverflow.com/questions/1549641/how-to-capitalize-the-first-letter-of-each-word-in-a-string-python
 #
-# Created:     16/07/2014
+# Created:     25/07/2014
 # Copyright:   (c) Megan 2014
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
@@ -140,7 +140,7 @@ class GUI:
         #test uniqueness of each school name entered u
         noduplicate = True;
         for record in self.recordlist:
-            if self.image_id_field.get() == record.get_id():
+            if int(self.image_id_field.get()) == int(record.get_id()):
                 noduplicate= False
                 tkinter.messagebox.showwarning('Warning!','Duplicate image ID');
                 print('Please enter image ID again');
@@ -151,19 +151,19 @@ class GUI:
             else:
                 try:
                     validated_integer = int(self.image_id_field.get())
-                    self.recordlist.append(Image(self.image_id_field.get(), self.filename_field.get(), self.file_ext.get(), self.title_field.get(), self.owner_fn_field.get(), self.owner_sn_field.get(), self.licence.get()))
-
+                    self.recordlist.append(Image(int(self.image_id_field.get()), self.filename_field.get(), self.file_ext.get(), self.title_field.get(), self.owner_fn_field.get(), self.owner_sn_field.get(), self.licence.get()))
 
                     self.ready_to_write= True
+                    print(self.filename_field.get())
                     tkinter.messagebox.showinfo('Notice','Submission Successful')
 
-                    self.image_id_field.delete(0, END) #command to clear field
-                    self.filename_field.delete(0, END)
-                    self.file_ext.set(self.ext_init)
-                    self.title_field.delete(0, END)
-                    self.owner_fn_field.delete(0, END)
-                    self.owner_sn_field.delete(0, END)
-                    self.licence.set(self.licence_init)
+##                    self.image_id_field.delete(0, END) #command to clear field
+##                    self.filename_field.delete(0, END)
+##                    self.file_ext.set(self.ext_init)
+##                    self.title_field.delete(0, END)
+##                    self.owner_fn_field.delete(0, END)
+##                    self.owner_sn_field.delete(0, END)
+##                    self.licence.set(self.licence_init)
 
 
                 except:
@@ -181,7 +181,8 @@ class GUI:
             #cycles through list of records created by gui
 
             for record in self.recordlist:
-                filename = record.get_filename() + record.get_file_ext()
+                filename = record.get_filename().replace(" ", "")
+                filename = filename + record.get_file_ext()
                 #Capitalises the owner's first name when written to csv file
                 #Used this code instead of title() as title has some inconsistencies such as when "McDonald" is typed. "Mcdonald" is outputted.
                 #This code fixes this by splitting the worlds, initial-capitalising the words and then rejoining the words, which changes the white space separating the words into a single white space.
@@ -189,6 +190,7 @@ class GUI:
                 owner_fn = ' '.join(word[0].upper() + word[1:] for word in record.get_owner_fn().split())
                 owner_sn = ' '.join(word[0].upper() + word[1:] for word in record.get_owner_sn().split())
                 title = ' '.join(word[0].upper() + word[1:] for word in record.get_title().split())
+
                 writer.writerow([record.get_id(),filename, title, owner_fn, owner_sn, record.get_licence()])
                 #explicitly closes the output file
             ofile.close()
@@ -200,3 +202,4 @@ class GUI:
 
 #initialises the programme
 GUI()
+
