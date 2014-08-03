@@ -1,11 +1,11 @@
 #-------------------------------------------------------------------------------
-# Name:        module2
+# Name:        metadata_imgV6
 #
-# Purpose:
+# Purpose:      To collect metadata about images including their ID, file name and extension, title, owner, and licence type, then write data to a CSV file so that it may be imported to a database
 # Author:      Megan
 # Sources:      http://stackoverflow.com/questions/21043387/how-do-you-add-input-from-user-into-list-in-python
-#                http://stackoverflow.com/questions/5278122/checking-if-all-elements-in-a-list-are-unique
-#
+#               http://stackoverflow.com/questions/5278122/checking-if-all-elements-in-a-list-are-unique
+#               http://stackoverflow.com/questions/1549641/how-to-capitalize-the-first-letter-of-each-word-in-a-string-python
 #
 # Created:     16/07/2014
 # Copyright:   (c) Megan 2014
@@ -182,7 +182,14 @@ class GUI:
 
             for record in self.recordlist:
                 filename = record.get_filename() + record.get_file_ext()
-                writer.writerow([record.get_id(),filename, record.get_title(), record.get_owner_fn(), record.get_owner_sn(), record.get_licence()])
+                #Capitalises the owner's first name when written to csv file
+                #Used this code instead of title() as title has some inconsistencies such as when "McDonald" is typed. "Mcdonald" is outputted.
+                #This code fixes this by splitting the worlds, initial-capitalising the words and then rejoining the words, which changes the white space separating the words into a single white space.
+                # e.g. if "hi                           megan" was someone's name, it  would output "hi megan"
+                owner_fn = ' '.join(word[0].upper() + word[1:] for word in record.get_owner_fn().split())
+                owner_sn = ' '.join(word[0].upper() + word[1:] for word in record.get_owner_sn().split())
+                title = ' '.join(word[0].upper() + word[1:] for word in record.get_title().split())
+                writer.writerow([record.get_id(),filename, title, owner_fn, owner_sn, record.get_licence()])
                 #explicitly closes the output file
             ofile.close()
         else:
