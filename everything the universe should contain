@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        metadata_imgV7
+# Name:        metadata_imgV8
 #
 # Purpose:      To collect metadata about images including their ID, file name and extension, title, owner, and licence type, then write data to a CSV file so that it may be imported to a database
 # Author:      Megan
@@ -7,7 +7,7 @@
 #               http://stackoverflow.com/questions/5278122/checking-if-all-elements-in-a-list-are-unique
 #               http://stackoverflow.com/questions/1549641/how-to-capitalize-the-first-letter-of-each-word-in-a-string-python
 #
-# Created:     25/07/2014
+# Created:     28/07/2014
 # Copyright:   (c) Megan 2014
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
@@ -18,11 +18,15 @@ def main():
 
 if __name__ == '__main__':
     main()
-def main():
-    pass
 
-if __name__ == '__main__':
-    main()
+
+# doct tests
+if __name__ == "__main__":
+    #imports doctesting
+    import doctest
+    doctest.testmod(verbose = True)
+
+
 #import GUI library
 from tkinter import *
 
@@ -41,6 +45,7 @@ class Image:
         self.licence = licence
 
     def get_id(self):
+
         return self.image_id
 
     def get_filename(self):
@@ -84,7 +89,7 @@ class GUI:
         self.image_id_field = Entry(window)
         self.image_id_field.pack()
 
-        file_ext_label = Label(window, text = 'Enter filename and select extension:', fg = "blue", bg = "cornsilk")
+        file_ext_label = Label(window, text = 'Enter filename and select extension:')
         file_ext_label.pack()
         self.filename_field = Entry(window)
         self.filename_field.pack()
@@ -92,7 +97,9 @@ class GUI:
         self.file_ext = StringVar()
         self.ext_init= "Select extension of image"
         self.file_ext.set(self.ext_init)
-        extensions = [".jpg", ".gif"]
+        # image formats in list decided by what majority of browsers can support
+        #http://en.wikipedia.org/wiki/Comparison_of_web_browsers#Image_format_support
+        extensions = [".JPEG", ".GIF", ".PNG"]
         OptionMenu(window, self.file_ext, *extensions).pack()
 
         title_label = Label(window, text = 'Enter title:')
@@ -137,7 +144,7 @@ class GUI:
 
     def doSubmit(self):
 
-        #test uniqueness of each school name entered u
+        #test uniqueness of image ID
         noduplicate = True;
         for record in self.recordlist:
             if int(self.image_id_field.get()) == int(record.get_id()):
@@ -150,6 +157,7 @@ class GUI:
                 tkinter.messagebox.showwarning('Warning!','Please enter a value for all fields')
             else:
                 try:
+                    #corrects image id to integer, not string
                     validated_integer = int(self.image_id_field.get())
                     self.recordlist.append(Image(int(self.image_id_field.get()), self.filename_field.get(), self.file_ext.get(), self.title_field.get(), self.owner_fn_field.get(), self.owner_sn_field.get(), self.licence.get()))
 
@@ -157,7 +165,7 @@ class GUI:
                     print(self.filename_field.get())
                     tkinter.messagebox.showinfo('Notice','Submission Successful')
 
-##                    self.image_id_field.delete(0, END) #command to clear field
+##                    self.image_id_field.delete(0, END) #command to clear fields as it is more productive for the user
 ##                    self.filename_field.delete(0, END)
 ##                    self.file_ext.set(self.ext_init)
 ##                    self.title_field.delete(0, END)
@@ -175,31 +183,36 @@ class GUI:
         import csv
         file_name = 'database.txt'
 
-        if self.ready_to_write: #cheacks data has been previously validated
-            ofile = open(file_name, 'a') #open with write('w') or append('a') privelages
+        if self.ready_to_write: #cheacks data has been validated
+            ofile = open(file_name, 'a')
             writer = csv.writer(ofile, delimiter=',')
-            #cycles through list of records created by gui
+
 
             for record in self.recordlist:
+                #for filenames, it is convention to have no spaces, this takes out the spaces
                 filename = record.get_filename().replace(" ", "")
+                #this joins the filename and extension back together i.e. flowers.JPEG
                 filename = filename + record.get_file_ext()
                 #Capitalises the owner's first name when written to csv file
                 #Used this code instead of title() as title has some inconsistencies such as when "McDonald" is typed. "Mcdonald" is outputted.
-                #This code fixes this by splitting the worlds, initial-capitalising the words and then rejoining the words, which changes the white space separating the words into a single white space.
+                #This code fixes this by splitting the words, initial-capitalising the words and then rejoining the words, which changes the white space separating the words into a single white space.
                 # e.g. if "hi                           megan" was someone's name, it  would output "hi megan"
                 owner_fn = ' '.join(word[0].upper() + word[1:] for word in record.get_owner_fn().split())
+                owner_fn = owner_fn.replace("," , "")
                 owner_sn = ' '.join(word[0].upper() + word[1:] for word in record.get_owner_sn().split())
                 title = ' '.join(word[0].upper() + word[1:] for word in record.get_title().split())
-
+                #writes the input into a csv file. Listing the input separates the
                 writer.writerow([record.get_id(),filename, title, owner_fn, owner_sn, record.get_licence()])
-                #explicitly closes the output file
+            #In v7, when the user writes to csv without validating, the error message is shown as well as the 'File Generated Successfully' message.
+            #Moving it here means that the 'File Generated Successfully' message will only be activated when everything is validated.
+            tkinter.messagebox.showinfo('Notice',file_name+' File Generated Successfully')
+            # closes the output file
             ofile.close()
         else:
             tkinter.messagebox.showwarning('Error!', 'You need to Validate your data')
 
         self.ready_to_write= False
-        tkinter.messagebox.showinfo('Notice',file_name+' File Generated Successfully')
+
 
 #initialises the programme
 GUI()
-
